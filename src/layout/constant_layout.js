@@ -52,15 +52,15 @@ function renderGraph(graph) {
     var y = nodes_obj[node].getFeature('coords').y;
     var z = nodes_obj[node].getFeature('coords').z;
 
-    vertices[i*3] = x - dims.AVG_X;
-    vertices[i*3 + 1] = y - dims.AVG_Y;
-    vertices[i*3 + 2] = z - dims.AVG_Z;
+    vertices[i*3] = x;// - dims.AVG_X;
+    vertices[i*3 + 1] = y;// - dims.AVG_Y;
+    vertices[i*3 + 2] = z;// - dims.AVG_Z;
 
     // Trying to set original color
     if ( nodes_obj[node].getFeature('color') ) {
-      nodeColors[i*3] = nodes_obj[node].getFeature('color').r/256.0;
-      nodeColors[i*3 + 1] = nodes_obj[node].getFeature('color').g/256.0;
-      nodeColors[i*3 + 2] = nodes_obj[node].getFeature('color').b/256.0;
+      nodeColors[i*3] = nodes_obj[node].getFeature('color').r; ///256.0;
+      nodeColors[i*3 + 1] = nodes_obj[node].getFeature('color').g; ///256.0;
+      nodeColors[i*3 + 2] = nodes_obj[node].getFeature('color').b; ///256.0;
     }
     else {
       var j = i * 3;
@@ -104,20 +104,20 @@ function renderGraph(graph) {
       var node_a_id = edge._node_a.getID();
       var node_b_id = edge._node_b.getID();
 
-      positionLine[i * 6] = nodes_obj[node_a_id].getFeature('coords').x - dims.AVG_X;
-      positionLine[i * 6 + 1] = nodes_obj[node_a_id].getFeature('coords').y - dims.AVG_Y;
-      positionLine[i * 6 + 2] = nodes_obj[node_a_id].getFeature('coords').z - dims.AVG_Z;
-      positionLine[i * 6 + 3] = nodes_obj[node_b_id].getFeature('coords').x - dims.AVG_X;
-      positionLine[i * 6 + 4] = nodes_obj[node_b_id].getFeature('coords').y - dims.AVG_Y;
-      positionLine[i * 6 + 5] = nodes_obj[node_b_id].getFeature('coords').z - dims.AVG_Z;
+      positionLine[i * 6] = nodes_obj[node_a_id].getFeature('coords').x;// - dims.AVG_X;
+      positionLine[i * 6 + 1] = nodes_obj[node_a_id].getFeature('coords').y;// - dims.AVG_Y;
+      positionLine[i * 6 + 2] = nodes_obj[node_a_id].getFeature('coords').z;// - dims.AVG_Z;
+      positionLine[i * 6 + 3] = nodes_obj[node_b_id].getFeature('coords').x;// - dims.AVG_X;
+      positionLine[i * 6 + 4] = nodes_obj[node_b_id].getFeature('coords').y;// - dims.AVG_Y;
+      positionLine[i * 6 + 5] = nodes_obj[node_b_id].getFeature('coords').z;// - dims.AVG_Z;
 
       if ( nodes_obj[node].getFeature('color') ) {
-        lineColors[i * 6] = nodes_obj[node_a_id].getFeature('color').r/256.0;
-        lineColors[i * 6 + 1] = nodes_obj[node_a_id].getFeature('color').g/256.0;
-        lineColors[i * 6 + 2] = nodes_obj[node_a_id].getFeature('color').b/256.0;
-        lineColors[i * 6 + 3] = nodes_obj[node_b_id].getFeature('color').r/256.0;
-        lineColors[i * 6 + 4] = nodes_obj[node_b_id].getFeature('color').g/256.0;
-        lineColors[i * 6 + 5] = nodes_obj[node_b_id].getFeature('color').b/256.0;
+        lineColors[i * 6] = nodes_obj[node_a_id].getFeature('color').r; ///256.0;
+        lineColors[i * 6 + 1] = nodes_obj[node_a_id].getFeature('color').g; ///256.0;
+        lineColors[i * 6 + 2] = nodes_obj[node_a_id].getFeature('color').b; ///256.0;
+        lineColors[i * 6 + 3] = nodes_obj[node_b_id].getFeature('color').r; ///256.0;
+        lineColors[i * 6 + 4] = nodes_obj[node_b_id].getFeature('color').g; ///256.0;
+        lineColors[i * 6 + 5] = nodes_obj[node_b_id].getFeature('color').b; ///256.0;
       }
       else {
         var j = i * 6;

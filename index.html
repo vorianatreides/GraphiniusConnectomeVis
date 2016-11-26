@@ -33,7 +33,7 @@
         
         <h4>Start/Stop Simulation:</h4>
         <div class="onoffswitch">
-          <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="forceLayoutSwitch" checked onclick=$GV.view.controlUI.startStopForce()>
+          <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="forceLayoutSwitch" checked onclick=$GV.view.controlUI.startStopNeuroSim()>
           <label class="onoffswitch-label" for="forceLayoutSwitch">
               <span class="onoffswitch-inner force"></span>
               <span class="onoffswitch-switch"></span>
@@ -60,33 +60,13 @@
         <input id="amplitude" type="range" min="1" max="5" step=".01" value="1" /> <br/>
         Steepness: <span id="steep_display">1</span> <br/>
         <input id="steepness" type="range" min="1" max="5" step=".01" value="1" /> <br/>
-        
-        <input id="switch2DButton" value="Switch to 2D" type="button" onclick=$GV.view.interaction.switchTo2D()><br/>
-        <input id="switch3DButton" value="Switch to 3D" type="button" onclick=$GV.view.interaction.switchTo3D()><br/><br/>
-        <!--<input id="changeNodeColorButton" value="Change Node Color" type="button" onclick=$GV.core.mutate.colorAllNodes(0)><br/>
-        <input id="changeEdgeColorButton" value="Change Edge Color" type="button" onclick=$GV.core.mutate.colorAllEdges(0)><br/><br/>
-        <input id="addRandomNodesButton" value="Add Random Node" type="button" onclick=$GV.core.mutate.addRandomNodes()><br/>
-        <input id="updateAllNodesButton" value="Update All Nodes" type="button" onclick=$GV.view.interaction.updateAll()><br/><br/>-->
-        <input id="randomBFSButton" value="BFS (random)" type="button" onclick=$GV.core.mutate.colorBFS(null)><br/>
-        <input id="chosenBFSButton" value="BFS (click)" type="button" onclick=$GV.core.mutate.colorBFSclick()><br/><br/>
-        <input id="randomPFSButton" value="PFS (random)" type="button" onclick=$GV.core.mutate.colorPFS(null)><br/>
-        <input id="chosenPFSButton" value="PFS (click)" type="button" onclick=$GV.core.mutate.colorPFSclick()><br/><br/>
-        <input id="randomDFSButton" value="DFS (random)" type="button" onclick=$GV.core.mutate.colorDFS(null)><br/>
-        <input id="chosenDFSButton" value="DFS (click)" type="button" onclick=$GV.core.mutate.colorDFSclick()><br/><br/>
-        
-        <!--<input id="chosenHideNodeButton" value="Hide Node (click)" type="button" onclick=$GV.core.mutate.hideNodeClick()><br/>
-        <input id="chosenColorNodeButton" value="Color Node (click)" type="button" onclick=$GV.core.mutate.colorSingleNodeClick()><br/>
-        <input id="chosenUpdateNodeButton" value="Update Node Position (click)" type="button" onclick=$GV.view.interaction.updateNodePositionClick()>-->
+
 
           <h3>Graph Information</h3>
           <div id="graphInfo">
             Number of nodes: <span id="nodes"></span><br/>
             Number of edges: <span id="edges"></span><br/>
-          <!--
-                    Time to read graph input file <span id="time"></span>
-          -->
           </div>
-                  
         </div>
         
         
@@ -112,8 +92,8 @@
     
     <div id="bg-blurry">
 
-		<script type="text/javascript" src="lib/three.min.js"></script>
-		<script type="text/javascript" src="lib/graphinius.min.js"></script>
+    <script type="text/javascript" src="lib/three.min.js"></script>
+    <script type="text/javascript" src="lib/graphinius.min.js"></script>
     <script type="text/javascript" src="build/graphinius.vis.js"></script>
     
     <!-- FPS Counter -->

@@ -1,4 +1,4 @@
-// window.$G = require('graphinius').$G;
+// window.$G = require('graphinius');
 
 var config = {
   // keys for handling events
@@ -26,7 +26,7 @@ var config = {
   defaults: {
     node_size: 4,
     background_color: 0x000000,
-    transparent: true,
+    transparent: false,
     opacity: 0.2, //default is 1; range: 0.0 - 1.0
     linewidth: 1,
     
@@ -40,7 +40,7 @@ var config = {
 
     //zoom
     ZOOM_FACTOR: 0.05,
-    MAX_FOV: 12000, //zoom out
+    MAX_FOV: 1200, //zoom out
     MIN_FOV: 1, //zoom in
 
     //distance to move

@@ -120,14 +120,16 @@ h1 {
 }
 
 .onoffswitch-inner.force:before {
-    content: "Constant";
+    content: "OFF";
     padding-left: 11px;
-    background-color: #34C251; color: #FFFFFF;
+    background-color: #FF0000;
+    color: #FFFFFF;
 }
 .onoffswitch-inner.force:after {
-    content: "Force";
+    content: "Running";
     padding-right: 11px;
-    background-color: #2B97F0; color: #FFFFFF;
+    background-color: #00FF00;
+    color: #303030;
     text-align: right;
 }
 

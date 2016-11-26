@@ -1,3 +1,5 @@
+var neuroSim = require('../neurosim/execSimulation.js');
+
 function readJSON(event, explicit, direction, weighted_mode) {
   var explicit = typeof explicit === 'undefined' ? false : explicit;
   var direction = typeof direction === 'undefined' ? false : direction;
@@ -10,7 +12,7 @@ function readJSON(event, explicit, direction, weighted_mode) {
     direction = true;
   }
   
-  var json = new $G.input.JsonInput(explicit, direction, weighted_mode);
+  var json = new $G.input.JSONInput(explicit, direction, weighted_mode);
 
   //checks if the browser supports the file API
   if (!window.File && window.FileReader && window.FileList && window.Blob) {
@@ -49,6 +51,9 @@ function readJSON(event, explicit, direction, weighted_mode) {
       //document.querySelector("#time").innerHTML = parsedFile.edges;
 
       result = parsedFile.data;
+
+      // Start the Neuro Simulation loop
+      neuroSim.initSimulation();
     }
   }
   reader.readAsText(files[0]);

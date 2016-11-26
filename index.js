@@ -11,7 +11,8 @@ var init            = require("./src/core/init.js"),
     fullscreen      = require("./src/view/fullscreen.js"),
     interaction     = require("./src/view/interaction.js"),
     navigation      = require("./src/view/navigation.js"),
-    controlUI       = require("./src/view/controlUI.js");
+    controlUI       = require("./src/view/controlUI.js"),
+    neuroSim        = require("./src/neurosim/execSimulation.js");
 
 
 var out = typeof window !== 'undefined' ? window : global;
@@ -40,6 +41,9 @@ out.$GV = {
     interaction: interaction,
     navigation: navigation,
     controlUI: controlUI
+  },
+  sim: {
+    neuroSim: neuroSim
   }
 };
 
