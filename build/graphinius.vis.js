@@ -430,6 +430,11 @@
 	var force = __webpack_require__(1).force_layout;
 	var switchToFullScreen = __webpack_require__(5).switchToFullScreen;
 	var neuroSim = __webpack_require__(6);
+	var querySelector = {
+	  threshold: 0.6,
+	  amplitude: 1,
+	  steepness: 15
+	}
 
 
 	if(localStorage.getItem("directed") == 1) {
@@ -479,6 +484,27 @@
 	    // force.fdStop();
 	  }
 	}
+
+	document.querySelector("#threshold").addEventListener('input', function(event) {
+	  var thresh = +document.querySelector("#threshold").value;
+	  querySelector.threshold = thresh;
+	  neuroSim.changeParams (querySelector);
+	  document.querySelector("#thresh_display").innerHTML = thresh;
+	});
+
+	document.querySelector("#amplitude").addEventListener('input', function(event) {
+	  var amp = +document.querySelector("#amplitude").value;
+	  querySelector.amplitude = amp;
+	  neuroSim.changeParams (querySelector);
+	  document.querySelector("#amp_display").innerHTML = amp;
+	});
+
+	document.querySelector("#steepness").addEventListener('input', function(event) {
+	  var k = +document.querySelector("#steepness").value;
+	  querySelector.steepness = k;
+	  neuroSim.changeParams (querySelector);
+	  document.querySelector("#steep_display").innerHTML = k;
+	});
 
 	// document.querySelector("#force_magnitude").addEventListener('input', function(event) {
 	//   var mag = +document.querySelector("#force_magnitude").value;
@@ -585,12 +611,23 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var neuroSim = __webpack_require__(7).$NG;
+	var mutate = __webpack_require__(12);
+	var render = __webpack_require__(2);
 
 	console.dir( neuroSim ); 
 
 	var RUNNING = false;
 	var sim;
+	var neuron;
 	var epoch = 0;
+	/*var properties = {
+	  threshold: 0.6,
+	  amplitude: 1,
+	  steepness: 15
+	}*/
+	var threshold = 0.6; // = sim.Threshold;
+	var amplitude = 1; // = sim.C;
+	var steepness = 15; // = sim.K;
 
 	function initSimulation() {
 	  if ( !window.graph ) {
@@ -598,6 +635,8 @@
 	  }
 
 	  sim = new neuroSim.Simulation.Simulation( window.graph );
+	  //neuron = new neuroSim.Neuron.Neuron ( window.graph.getNodeById ("ADAL").degree );
+	  console.log (window.graph.getNodeById ("ADAL").degree);
 
 	  execSimulation();
 	}
@@ -611,7 +650,12 @@
 	  if ( RUNNING ) {
 	    console.log('calculating and visualizing epoch...' + epoch++);
 
+	    sim.Sine = true;
 	    var result = sim.calculateEpoch();
+	    mutate.colorSingleNode (window.graph.getNodeById ("ADAL"), 0xaabb00);
+	    render.update;
+	    //render.update();
+	    //render.updateGraph();
 	    console.log( result );
 	  }
 
@@ -625,6 +669,16 @@
 
 	function pauseSimulation() {
 	  RUNNING = false;
+	  console.log ("Global threshold is: " + threshold);
+	  console.log ("Global amplitude is: " + amplitude);
+	  console.log ("Global steepness is: " + steepness);
+	}
+
+
+	function changeParams (querySelector) {
+	  threshold = querySelector.threshold;
+	  amplitude = querySelector.amplitude;
+	  steepness = querySelector.steepness;
 	}
 
 
@@ -632,7 +686,8 @@
 	  initSimulation: initSimulation,
 	  startSimulation: startSimulation,
 	  pauseSimulation: pauseSimulation,
-	  execSimulation: execSimulation
+	  execSimulation: execSimulation,
+	  changeParams: changeParams
 	};
 
 /***/ },
@@ -673,26 +728,15 @@
 	    //----------------------------------------------------------------------------
 	    function Simulation(_graph) {
 	        this._graph = _graph;
-	        this._neuron_list = [];
-	        this._activation_model = "sigmoidal";
-	        this._bounds = [0, 1];
-	        this._all_ids = [];
-	        this._epoch = 0;
-	        this._sine = false;
-	        this._noise = false; // Should biologically speaking be true!
-	        this._undirected = !!this._graph.getStats().nr_und_edges; // Should normally be true
-	        var all_nodes = this._graph.getNodes();
-	        var ctr = 0;
-	        for (var i in all_nodes) {
-	            this._neuron_list.push(new Neuron(all_nodes[i]));
-	            this._all_ids[i] = ctr++;
-	        }
-	        this.activationFunc = this.sigmoid;
-	        this.generateInVec();
+	        this.setDefaults();
 	    }
 	    Object.defineProperty(Simulation.prototype, "Graph", {
 	        //----------------------------------------------------------------------------
 	        get: function () { return this._graph; },
+	        set: function (graph) {
+	            this._graph = graph;
+	            this.setDefaults();
+	        },
 	        enumerable: true,
 	        configurable: true
 	    });
@@ -737,15 +781,30 @@
 	        configurable: true
 	    });
 	    //----------------------------------------------------------------------------
+	    // Private method to set all default values
+	    Simulation.prototype.setDefaults = function () {
+	        this._neuron_list = [];
+	        this._activation_model = "sigmoidal";
+	        this._bounds = [0, 1];
+	        this._all_ids = [];
+	        this._epoch = 0;
+	        this._sine = false;
+	        this._noise = false; // Should biologically speaking be true!
+	        this._undirected = !!this._graph.getStats().nr_und_edges; // Should normally be true
+	        var all_nodes = this._graph.getNodes();
+	        var ctr = 0;
+	        for (var i in all_nodes) {
+	            this._neuron_list.push(new Neuron(all_nodes[i]));
+	            this._all_ids[i] = ctr++;
+	        }
+	        this.activationFunc = this.sigmoid;
+	        this.generateInVec();
+	    };
 	    // Private method to generate the initial conditions
 	    Simulation.prototype.generateInVec = function () {
 	        for (var i in this._neuron_list) {
-	            //this._neuron_list[i].Activation = this._neuron_list[i].Node.getID() === "A" || this._neuron_list[i].Node.getID() === "B" ? 0.8 : 0;
-	            if (this._neuron_list[i].Node.getID() === "A") {
-	                this._neuron_list[i].Activation = 0.999999;
-	            }
-	            if (this._neuron_list[i].Node.getID() === "B") {
-	                this._neuron_list[i].Activation = 0.5;
+	            if (Math.random() <= 0.15) {
+	                this._neuron_list[i].Activation = this._neuron_list[i].C * Math.random();
 	            }
 	        }
 	    };
@@ -842,17 +901,19 @@
 	        }
 	        return ans;
 	    };
-	    // Private method to calculate one epoch
+	    //----------------------------------------------------------------------------
+	    // Public method to calculate one epoch
 	    Simulation.prototype.calculateEpoch = function () {
 	        var tmp = this.calcInput();
 	        var output = this.activationFunc(tmp);
 	        for (var i in this._neuron_list) {
 	            this._neuron_list[i].Refraction -= this._neuron_list[i].Refraction !== 1 ? 1 : 0;
 	            this._neuron_list[i].Refraction = this._neuron_list[i].Activation >= this._neuron_list[i].Threshold ? 3 : this._neuron_list[i].Refraction;
+	            this._neuron_list[i].Activation = output[i];
+	            this._neuron_list[i].setColor(this._bounds[0], this._bounds[1]);
 	        }
 	        return output;
 	    };
-	    //----------------------------------------------------------------------------
 	    // Public method to set a new graph for the simulation
 	    //setGraph (graph: $G.core.IGraph) {
 	    //  this = new Simulation (graph);
@@ -899,10 +960,6 @@
 	        for (var i = 0; i < nr_epochs; ++i) {
 	            console.log();
 	            var output = this.calculateEpoch();
-	            for (var j in this._neuron_list) {
-	                this._neuron_list[j].Activation = output[j];
-	                this._neuron_list[j].setColor(this._bounds[0], this._bounds[1]);
-	            }
 	            this.writeEpochsTable(i + 1);
 	        }
 	    };
