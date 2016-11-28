@@ -1,6 +1,16 @@
 // window.$G = require('graphinius');
 
 var config = {
+  neurosim: {
+    params: {
+      threshold: 0.6,
+      amplitude: 1,
+      steepness: 15
+    },
+    control: {
+      RUNNING: false
+    }
+  },
   // keys for handling events
   keys: {
     KEY_A: 97,

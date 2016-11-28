@@ -1,6 +1,8 @@
 var force = require("../core/init.js").force_layout;
 var switchToFullScreen = require("./fullscreen").switchToFullScreen;
-var neuroSim = require("../neurosim/execSimulation");
+var neuroParams = require("../core/init.js").neurosim.params;
+var simParams = require("../core/init.js").neurosim.control;
+
 var querySelector = {
   threshold: 0.6,
   amplitude: 1,
@@ -36,11 +38,11 @@ function setDirectionUnchecked() {
 function startStopNeuroSim() {
   //start force directed layout
   if(!document.querySelector("#forceLayoutSwitch").checked) {
-    neuroSim.startSimulation();
+    simParams.RUNNING = true;
   }
   //stop force directed layout
   else {
-    neuroSim.pauseSimulation();
+    simParams.RUNNING = false;
   }
 }
 
@@ -59,21 +61,25 @@ function startStopHistory() {
 document.querySelector("#threshold").addEventListener('input', function(event) {
   var thresh = +document.querySelector("#threshold").value;
   querySelector.threshold = thresh;
-  neuroSim.changeParams (querySelector);
+  // neuroSim.changeParams (querySelector);
+  neuroParams.threshold = thresh;
+  // console.log( "new thresh: " + thresh );
   document.querySelector("#thresh_display").innerHTML = thresh;
 });
 
 document.querySelector("#amplitude").addEventListener('input', function(event) {
   var amp = +document.querySelector("#amplitude").value;
   querySelector.amplitude = amp;
-  neuroSim.changeParams (querySelector);
+  // neuroSim.changeParams (querySelector);
+  neuroParams.amplitude = amp;
   document.querySelector("#amp_display").innerHTML = amp;
 });
 
 document.querySelector("#steepness").addEventListener('input', function(event) {
   var k = +document.querySelector("#steepness").value;
   querySelector.steepness = k;
-  neuroSim.changeParams (querySelector);
+  // neuroSim.changeParams (querySelector);
+  neuroParams.steepness = k;
   document.querySelector("#steep_display").innerHTML = k;
 });
 

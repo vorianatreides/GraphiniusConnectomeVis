@@ -1,30 +1,30 @@
 var neuroSim = require('neuro-graphs').$NG;
 var mutate = require('../core/mutate.js');
 var render = require('../core/render.js');
+var neuroParams = require("../core/init.js").neurosim.params;
+var simParams = require("../core/init.js").neurosim.control;
 
-console.dir( neuroSim ); 
+console.dir( neuroSim );
+console.dir( render );
+console.dir( "Render.update is: " + render.update );
 
-var RUNNING = false;
 var sim;
 var neuron;
 var epoch = 0;
-/*var properties = {
-  threshold: 0.6,
-  amplitude: 1,
-  steepness: 15
-}*/
-var threshold = 0.6; // = sim.Threshold;
-var amplitude = 1; // = sim.C;
-var steepness = 15; // = sim.K;
+
 
 function initSimulation() {
   if ( !window.graph ) {
     throw new Error('no graph loaded yet...');
   }
+  // TODO: implement
+  // if ( "graph not rendered yet..." ) {
+
+  // }
 
   sim = new neuroSim.Simulation.Simulation( window.graph );
   //neuron = new neuroSim.Neuron.Neuron ( window.graph.getNodeById ("ADAL").degree );
-  console.log (window.graph.getNodeById ("ADAL").degree);
+  // console.log (window.graph.getNodeById ("ADAL").degree);
 
   execSimulation();
 }
@@ -35,45 +35,38 @@ function execSimulation() {
   window.requestAnimationFrame( execSimulation );
 
   // Here we need to calculate epochs
-  if ( RUNNING ) {
+  if ( simParams.RUNNING ) {
     console.log('calculating and visualizing epoch...' + epoch++);
+    var nodes = window.graph.getNodes();
+    var und_edges = window.graph.getUndEdges();
+    var dir_edges = window.graph.getDirEdges();
 
     sim.Sine = true;
     var result = sim.calculateEpoch();
-    mutate.colorSingleNode (window.graph.getNodeById ("ADAL"), 0xaabb00);
-    render.update;
-    //render.update();
-    //render.updateGraph();
-    console.log( result );
+
+
+    for ( var node in nodes ) {
+      var random_color = +('0x'+Math.random().toString(16).substr(2, 6));
+      mutate.colorSingleNode ( nodes[node], random_color);
+    }
+    for ( var undy in und_edges ) {
+      var random_color_a = +('0x'+Math.random().toString(16).substr(2, 6));
+      var random_color_b = +('0x'+Math.random().toString(16).substr(2, 6));
+      mutate.colorSingleEdge ( und_edges[undy], random_color_a, random_color_b);
+    }
+    for ( var diry in dir_edges ) {
+      var random_color_a = +('0x'+Math.random().toString(16).substr(2, 6));
+      var random_color_b = +('0x'+Math.random().toString(16).substr(2, 6));
+      mutate.colorSingleEdge ( dir_edges[diry], random_color_a, random_color_b);
+    }
+
+    window.requestAnimationFrame( render.update );
+    // console.log( result );
   }
-
-}
-
-
-function startSimulation() {
-  RUNNING = true;
-}
-
-
-function pauseSimulation() {
-  RUNNING = false;
-  console.log ("Global threshold is: " + threshold);
-  console.log ("Global amplitude is: " + amplitude);
-  console.log ("Global steepness is: " + steepness);
-}
-
-
-function changeParams (querySelector) {
-  threshold = querySelector.threshold;
-  amplitude = querySelector.amplitude;
-  steepness = querySelector.steepness;
 }
 
 
 module.exports = {
   initSimulation: initSimulation,
-  startSimulation: startSimulation,
-  pauseSimulation: pauseSimulation,
-  execSimulation: execSimulation,
-  changeParams: changeParams
+  execSimulation: execSimulation
 };
