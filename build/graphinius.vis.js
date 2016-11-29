@@ -1150,7 +1150,7 @@
 	  }
 	  // TODO: implement
 	  // if ( "graph not rendered yet..." ) {
-
+	  //   killSelf();
 	  // }
 
 	  sim = new neuroSim.Simulation.Simulation( window.graph );
@@ -1167,16 +1167,24 @@
 
 	  // Here we need to calculate epochs
 	  if ( simParams.RUNNING ) {
-	    console.log('calculating and visualizing epoch...' + epoch++);
 	    var nodes = window.graph.getNodes();
 	    var und_edges = window.graph.getUndEdges();
 	    var dir_edges = window.graph.getDirEdges();
-
 	    sim.Sine = true;
 	    var result = sim.calculateEpoch();
-
-
-	    for ( var node in nodes ) {
+	    var colors = [];
+	    var ctr = 0;
+	    for (var node in nodes) {
+	      colors[node] = interpolateColors (result[ctr++], -1, 1);
+	      mutate.colorSingleNode (nodes[node], colors[node]);
+	    }
+	    for ( var undy in und_edges ) {
+	      mutate.colorSingleEdge ( und_edges[undy], colors[und_edges[undy].getNodes().a.getID()], colors[und_edges[undy].getNodes().b.getID()]);
+	    }
+	    for ( var diry in dir_edges ) {
+	      mutate.colorSingleEdge ( dir_edges[diry], colors[dir_edges[diry].getNodes().a.getID()], colors[dir_edges[diry].getNodes().b.getID()]);
+	    }
+	    /*for ( var node in nodes ) {
 	      var random_color = +('0x'+Math.random().toString(16).substr(2, 6));
 	      mutate.colorSingleNode ( nodes[node], random_color);
 	    }
@@ -1189,17 +1197,65 @@
 	      var random_color_a = +('0x'+Math.random().toString(16).substr(2, 6));
 	      var random_color_b = +('0x'+Math.random().toString(16).substr(2, 6));
 	      mutate.colorSingleEdge ( dir_edges[diry], random_color_a, random_color_b);
-	    }
+	    }*/
 
 	    window.requestAnimationFrame( render.update );
-	    // console.log( result );
 	  }
+	}
+
+
+	function interpolateColors (result, min, max) {
+	  if (sim.Sine) {
+	    min = -1;
+	    max = 1;
+	  }
+	  var start_color = 0x0000ff,
+	      middle_color = 0x00ff00,
+	      end_color = 0xff0000,
+	      first_color = start_color,
+	      second_color = middle_color,
+	      low = min,
+	      up = max,
+	      half = (up - low) / 2,
+	      middle = low + half;
+
+	   var mod_half = result - low;
+	   if (result > middle) {
+	     first_color = middle_color;
+	     second_color = end_color;
+	     mod_half = result - middle;
+	   }
+	   return Math.round (first_color + (second_color - first_color) / half * mod_half);
+	}
+
+
+	function execOnce() {
+	  var nodes = window.graph.getNodes();
+	  var und_edges = window.graph.getUndEdges();
+	  var dir_edges = window.graph.getDirEdges();
+	  sim.Sine = true;
+	  var result = sim.calculateEpoch();
+	  var colors = [];
+	  var ctr = 0;
+	  for (var node in nodes) {
+	    colors[node] = interpolateColors (result[ctr++], -1, 1);
+	    mutate.colorSingleNode (nodes[node], colors[node]);
+	  }
+	  for ( var undy in und_edges ) {
+	    mutate.colorSingleEdge ( und_edges[undy], colors[und_edges[undy].getNodes().a.getID()], colors[und_edges[undy].getNodes().b.getID()]);
+	  }
+	  for ( var diry in dir_edges ) {
+	    mutate.colorSingleEdge ( dir_edges[diry], colors[dir_edges[diry].getNodes().a.getID()], colors[dir_edges[diry].getNodes().b.getID()]);
+	  }
+
+	  window.requestAnimationFrame( render.update );
 	}
 
 
 	module.exports = {
 	  initSimulation: initSimulation,
-	  execSimulation: execSimulation
+	  execSimulation: execSimulation,
+	  execOnce: execOnce
 	};
 
 /***/ },
@@ -1240,26 +1296,15 @@
 	    //----------------------------------------------------------------------------
 	    function Simulation(_graph) {
 	        this._graph = _graph;
-	        this._neuron_list = [];
-	        this._activation_model = "sigmoidal";
-	        this._bounds = [0, 1];
-	        this._all_ids = [];
-	        this._epoch = 0;
-	        this._sine = false;
-	        this._noise = false; // Should biologically speaking be true!
-	        this._undirected = !!this._graph.getStats().nr_und_edges; // Should normally be true
-	        var all_nodes = this._graph.getNodes();
-	        var ctr = 0;
-	        for (var i in all_nodes) {
-	            this._neuron_list.push(new Neuron(all_nodes[i]));
-	            this._all_ids[i] = ctr++;
-	        }
-	        this.activationFunc = this.sigmoid;
-	        this.generateInVec();
+	        this.setDefaults();
 	    }
 	    Object.defineProperty(Simulation.prototype, "Graph", {
 	        //----------------------------------------------------------------------------
 	        get: function () { return this._graph; },
+	        set: function (graph) {
+	            this._graph = graph;
+	            this.setDefaults();
+	        },
 	        enumerable: true,
 	        configurable: true
 	    });
@@ -1304,15 +1349,30 @@
 	        configurable: true
 	    });
 	    //----------------------------------------------------------------------------
+	    // Private method to set all default values
+	    Simulation.prototype.setDefaults = function () {
+	        this._neuron_list = [];
+	        this._activation_model = "sigmoidal";
+	        this._bounds = [0, 1];
+	        this._all_ids = [];
+	        this._epoch = 0;
+	        this._sine = false;
+	        this._noise = false; // Should biologically speaking be true!
+	        this._undirected = !!this._graph.getStats().nr_und_edges; // Should normally be true
+	        var all_nodes = this._graph.getNodes();
+	        var ctr = 0;
+	        for (var i in all_nodes) {
+	            this._neuron_list.push(new Neuron(all_nodes[i]));
+	            this._all_ids[i] = ctr++;
+	        }
+	        this.activationFunc = this.sigmoid;
+	        this.generateInVec();
+	    };
 	    // Private method to generate the initial conditions
 	    Simulation.prototype.generateInVec = function () {
 	        for (var i in this._neuron_list) {
-	            //this._neuron_list[i].Activation = this._neuron_list[i].Node.getID() === "A" || this._neuron_list[i].Node.getID() === "B" ? 0.8 : 0;
-	            if (this._neuron_list[i].Node.getID() === "A") {
-	                this._neuron_list[i].Activation = 0.999999;
-	            }
-	            if (this._neuron_list[i].Node.getID() === "B") {
-	                this._neuron_list[i].Activation = 0.5;
+	            if (Math.random() <= 0.15) {
+	                this._neuron_list[i].Activation = this._neuron_list[i].C * Math.random();
 	            }
 	        }
 	    };
@@ -1409,17 +1469,19 @@
 	        }
 	        return ans;
 	    };
-	    // Private method to calculate one epoch
+	    //----------------------------------------------------------------------------
+	    // Public method to calculate one epoch
 	    Simulation.prototype.calculateEpoch = function () {
 	        var tmp = this.calcInput();
 	        var output = this.activationFunc(tmp);
 	        for (var i in this._neuron_list) {
 	            this._neuron_list[i].Refraction -= this._neuron_list[i].Refraction !== 1 ? 1 : 0;
 	            this._neuron_list[i].Refraction = this._neuron_list[i].Activation >= this._neuron_list[i].Threshold ? 3 : this._neuron_list[i].Refraction;
+	            this._neuron_list[i].Activation = output[i];
+	            this._neuron_list[i].setColor(this._bounds[0], this._bounds[1]);
 	        }
 	        return output;
 	    };
-	    //----------------------------------------------------------------------------
 	    // Public method to set a new graph for the simulation
 	    //setGraph (graph: $G.core.IGraph) {
 	    //  this = new Simulation (graph);
@@ -1466,10 +1528,6 @@
 	        for (var i = 0; i < nr_epochs; ++i) {
 	            console.log();
 	            var output = this.calculateEpoch();
-	            for (var j in this._neuron_list) {
-	                this._neuron_list[j].Activation = output[j];
-	                this._neuron_list[j].setColor(this._bounds[0], this._bounds[1]);
-	            }
 	            this.writeEpochsTable(i + 1);
 	        }
 	    };
