@@ -23,8 +23,7 @@
         <h3>Graph Input</h3>
           <form>
             <input type="radio" id="undirected" name="direction" value="undirected" onclick><label for="undirected">undirected graph</label><br>
-            <input type="radio" id="directed" name="direction" value="directed" onclick><label for="directed">directed graph</label><br>
-            <input type="radio" id="mixed" name="direction" value="mixed" onclick><label for="mixed">mixed graph</label><br><br>
+            <input type="radio" id="directed" name="direction" value="directed" onclick><label for="directed">directed graph</label><br><br>
           <form>
           <input id="input" value="Read File" class="button" type="file" onchange="$GV.input.json.readJSON(null, false, false, true)"><br><br>
           <input id="renderButton" value="Render Graph" type="button" onclick="$GV.core.render.renderGraph()">
@@ -40,12 +39,14 @@
           </label>
         </div><br/>
         
+        <input id="setInputVec" value="Set a random input" type="button" onclick=$GV.sim.neuroSim.setInputVec()><br/>
+        
         <h4>Activation Function:</h4>
           <form>
             <input type="radio" id="sigmoidal" name="activation" value="sigmoidal" onclick><label for="sigmoidal">sigmoidal function</label><br>
             <input type="radio" id="tanh" name="activation" value="tanh" onclick><label for="tanh">hyperbolic tangent function</label><br>
             <input type="radio" id="step" name="activation" value="step" onclick><label for="step">unit step function</label><br>
-            <input type="radio" id="rlu" name="activation" value="rlu" onclick><label for="rlu">[parametric?] rectifier</label><br>
+            <input type="radio" id="rlu" name="activation" value="rlu" onclick><label for="rlu">[parametric?] linear rectifier</label><br>
             <input type="radio" id="sin" name="activation" value="sin" onclick><label for="sin">simple oscillation</label><br>
           </form>
         
@@ -59,7 +60,9 @@
         Amplitude: <span id="amp_display">1</span> <br/>
         <input id="amplitude" type="range" min="1" max="5" step=".01" value="1" /> <br/>
         Steepness: <span id="steep_display">15</span> <br/>
-        <input id="steepness" type="range" min="1" max="20" step=".1" value="15" /> <br/><br/>
+        <input id="steepness" type="range" min="1" max="20" step=".1" value="15" /> <br/>
+        Noise: <span id="noise_display">0</span> <br/>
+        <input id="noise" type="range" min="0" max="5" step=".01" value="0" /> <br/><br/>
         
         
         <input id="nextEpochButton" value="Show next epoch" type="button" onclick=$GV.sim.neuroSim.execOnce()><br/>

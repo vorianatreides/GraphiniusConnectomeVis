@@ -3,11 +3,6 @@ var switchToFullScreen = require("./fullscreen").switchToFullScreen;
 var neuroParams = require("../core/init.js").neurosim.params;
 var simParams = require("../core/init.js").neurosim.control;
 
-var querySelector = {
-  threshold: 0.6,
-  amplitude: 1,
-  steepness: 15
-}
 
 
 if(localStorage.getItem("directed") == 1) {
@@ -35,6 +30,27 @@ function setDirectionUnchecked() {
 }
 
 
+sigmoidal.onclick = function() {
+  neuroParams.activation = "sigmoidl";
+};
+
+tanh.onclick = function() {
+  neuroParams.activation = "tanh";
+};
+
+step.onclick = function() {
+  neuroParams.activation = "step";
+};
+
+rlu.onclick = function() {
+  neuroParams.activation = "rlu";
+};
+
+sin.onclick = function() {
+  neuroParams.activation = "sin";
+};
+
+
 function startStopNeuroSim() {
   //start force directed layout
   if(!document.querySelector("#forceLayoutSwitch").checked) {
@@ -60,8 +76,6 @@ function startStopHistory() {
 
 document.querySelector("#threshold").addEventListener('input', function(event) {
   var thresh = +document.querySelector("#threshold").value;
-  querySelector.threshold = thresh;
-  // neuroSim.changeParams (querySelector);
   neuroParams.threshold = thresh;
   // console.log( "new thresh: " + thresh );
   document.querySelector("#thresh_display").innerHTML = thresh;
@@ -69,18 +83,20 @@ document.querySelector("#threshold").addEventListener('input', function(event) {
 
 document.querySelector("#amplitude").addEventListener('input', function(event) {
   var amp = +document.querySelector("#amplitude").value;
-  querySelector.amplitude = amp;
-  // neuroSim.changeParams (querySelector);
   neuroParams.amplitude = amp;
   document.querySelector("#amp_display").innerHTML = amp;
 });
 
 document.querySelector("#steepness").addEventListener('input', function(event) {
   var k = +document.querySelector("#steepness").value;
-  querySelector.steepness = k;
-  // neuroSim.changeParams (querySelector);
   neuroParams.steepness = k;
   document.querySelector("#steep_display").innerHTML = k;
+});
+
+document.querySelector("#noise").addEventListener('input', function(event) {
+  var noise = +document.querySelector("#noise").value;
+  neuroParams.noise = noise;
+  document.querySelector("#noise_display").innerHTML = noise;
 });
 
 // document.querySelector("#force_magnitude").addEventListener('input', function(event) {

@@ -4,12 +4,12 @@ var render = require('../core/render.js');
 var neuroParams = require("../core/init.js").neurosim.params;
 var simParams = require("../core/init.js").neurosim.control;
 
-console.dir( neuroSim );
-console.dir( render );
-console.dir( "Render.update is: " + render.update );
+// console.dir( neuroSim );
+// console.dir( render );
+// console.dir( "Render.update is: " + render.update );
 
 var sim;
-var neuron;
+// var neuron;
 var epoch = 0;
 
 
@@ -36,39 +36,7 @@ function execSimulation() {
 
   // Here we need to calculate epochs
   if ( simParams.RUNNING ) {
-    var nodes = window.graph.getNodes();
-    var und_edges = window.graph.getUndEdges();
-    var dir_edges = window.graph.getDirEdges();
-    sim.Sine = true;
-    var result = sim.calculateEpoch();
-    var colors = [];
-    var ctr = 0;
-    for (var node in nodes) {
-      colors[node] = interpolateColors (result[ctr++], -1, 1);
-      mutate.colorSingleNode (nodes[node], colors[node]);
-    }
-    for ( var undy in und_edges ) {
-      mutate.colorSingleEdge ( und_edges[undy], colors[und_edges[undy].getNodes().a.getID()], colors[und_edges[undy].getNodes().b.getID()]);
-    }
-    for ( var diry in dir_edges ) {
-      mutate.colorSingleEdge ( dir_edges[diry], colors[dir_edges[diry].getNodes().a.getID()], colors[dir_edges[diry].getNodes().b.getID()]);
-    }
-    /*for ( var node in nodes ) {
-      var random_color = +('0x'+Math.random().toString(16).substr(2, 6));
-      mutate.colorSingleNode ( nodes[node], random_color);
-    }
-    for ( var undy in und_edges ) {
-      var random_color_a = +('0x'+Math.random().toString(16).substr(2, 6));
-      var random_color_b = +('0x'+Math.random().toString(16).substr(2, 6));
-      mutate.colorSingleEdge ( und_edges[undy], random_color_a, random_color_b);
-    }
-    for ( var diry in dir_edges ) {
-      var random_color_a = +('0x'+Math.random().toString(16).substr(2, 6));
-      var random_color_b = +('0x'+Math.random().toString(16).substr(2, 6));
-      mutate.colorSingleEdge ( dir_edges[diry], random_color_a, random_color_b);
-    }*/
-
-    window.requestAnimationFrame( render.update );
+    execOnce();
   }
 }
 
@@ -99,15 +67,34 @@ function interpolateColors (result, min, max) {
 
 
 function execOnce() {
+  if (sim.ActivationModel !== neuroParams.activation) {
+    sim.setActivationModel (neuroParams.activation);
+  }
+  if (sim._neuron_list[0].Threshold !== neuroParams.threshold || sim._neuron_list[0].C !== neuroParams.amplitude || sim._neuron_list[0].K !== neuroParams.steepness) {
+    for (var neuron = 0; neuron < window.graph.nrNodes(); ++neuron) {
+    //   console.log (sim._neuron_list[neuron].Node.getID() + ": " + sim._neuron_list[neuron].Activation);
+    //   if (sim._neuron_list[neuron].Node.getID() === "A" && !!!epoch) {
+    //     sim._neuron_list[neuron].Activation = 0.999999;
+    //   }
+    //   if (sim._neuron_list[neuron].Node.getID() === "B" && !!!epoch) {
+    //     sim._neuron_list[neuron].Activation = 0.5;
+    //   }
+      sim._neuron_list[neuron].Threshold = neuroParams.threshold;
+      sim._neuron_list[neuron].C = neuroParams.amplitude;
+      sim._neuron_list[neuron].K = neuroParams.steepness;
+    }
+  }
+  // console.log ("Calculating and visualizing epoch nr: " + epoch++);
   var nodes = window.graph.getNodes();
   var und_edges = window.graph.getUndEdges();
   var dir_edges = window.graph.getDirEdges();
-  sim.Sine = true;
+  // sim.Sine = true;
+  // sim.setActivationModel ("tanh");
   var result = sim.calculateEpoch();
   var colors = [];
   var ctr = 0;
   for (var node in nodes) {
-    colors[node] = interpolateColors (result[ctr++], -1, 1);
+    colors[node] = interpolateColors (result[ctr++], 0, 1);
     mutate.colorSingleNode (nodes[node], colors[node]);
   }
   for ( var undy in und_edges ) {
@@ -116,13 +103,33 @@ function execOnce() {
   for ( var diry in dir_edges ) {
     mutate.colorSingleEdge ( dir_edges[diry], colors[dir_edges[diry].getNodes().a.getID()], colors[dir_edges[diry].getNodes().b.getID()]);
   }
+/*for ( var node in nodes ) {
+    var random_color = +('0x'+Math.random().toString(16).substr(2, 6));
+    mutate.colorSingleNode ( nodes[node], random_color);
+  }
+  for ( var undy in und_edges ) {
+    var random_color_a = +('0x'+Math.random().toString(16).substr(2, 6));
+    var random_color_b = +('0x'+Math.random().toString(16).substr(2, 6));
+    mutate.colorSingleEdge ( und_edges[undy], random_color_a, random_color_b);
+  }
+  for ( var diry in dir_edges ) {
+    var random_color_a = +('0x'+Math.random().toString(16).substr(2, 6));
+    var random_color_b = +('0x'+Math.random().toString(16).substr(2, 6));
+    mutate.colorSingleEdge ( dir_edges[diry], random_color_a, random_color_b);
+  }*/
 
   window.requestAnimationFrame( render.update );
 }
+
+function setInputVec() {
+  sim.generateInVec(0.05); // Additional implementation necessary!
+}
+
 
 
 module.exports = {
   initSimulation: initSimulation,
   execSimulation: execSimulation,
-  execOnce: execOnce
+  execOnce: execOnce,
+  setInputVec: setInputVec
 };

@@ -5,7 +5,9 @@ var config = {
     params: {
       threshold: 0.6,
       amplitude: 1,
-      steepness: 15
+      steepness: 15,
+      activation: "sigmoidal",
+      noise: 0
     },
     control: {
       RUNNING: false

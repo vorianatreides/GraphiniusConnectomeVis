@@ -110,7 +110,9 @@
 	    params: {
 	      threshold: 0.6,
 	      amplitude: 1,
-	      steepness: 15
+	      steepness: 15,
+	      activation: "sigmoidal",
+	      noise: 0
 	    },
 	    control: {
 	      RUNNING: false
@@ -442,11 +444,6 @@
 	var neuroParams = __webpack_require__(1).neurosim.params;
 	var simParams = __webpack_require__(1).neurosim.control;
 
-	var querySelector = {
-	  threshold: 0.6,
-	  amplitude: 1,
-	  steepness: 15
-	}
 
 
 	if(localStorage.getItem("directed") == 1) {
@@ -474,6 +471,27 @@
 	}
 
 
+	sigmoidal.onclick = function() {
+	  neuroParams.activation = "sigmoidl";
+	};
+
+	tanh.onclick = function() {
+	  neuroParams.activation = "tanh";
+	};
+
+	step.onclick = function() {
+	  neuroParams.activation = "step";
+	};
+
+	rlu.onclick = function() {
+	  neuroParams.activation = "rlu";
+	};
+
+	sin.onclick = function() {
+	  neuroParams.activation = "sin";
+	};
+
+
 	function startStopNeuroSim() {
 	  //start force directed layout
 	  if(!document.querySelector("#forceLayoutSwitch").checked) {
@@ -499,8 +517,6 @@
 
 	document.querySelector("#threshold").addEventListener('input', function(event) {
 	  var thresh = +document.querySelector("#threshold").value;
-	  querySelector.threshold = thresh;
-	  // neuroSim.changeParams (querySelector);
 	  neuroParams.threshold = thresh;
 	  // console.log( "new thresh: " + thresh );
 	  document.querySelector("#thresh_display").innerHTML = thresh;
@@ -508,18 +524,20 @@
 
 	document.querySelector("#amplitude").addEventListener('input', function(event) {
 	  var amp = +document.querySelector("#amplitude").value;
-	  querySelector.amplitude = amp;
-	  // neuroSim.changeParams (querySelector);
 	  neuroParams.amplitude = amp;
 	  document.querySelector("#amp_display").innerHTML = amp;
 	});
 
 	document.querySelector("#steepness").addEventListener('input', function(event) {
 	  var k = +document.querySelector("#steepness").value;
-	  querySelector.steepness = k;
-	  // neuroSim.changeParams (querySelector);
 	  neuroParams.steepness = k;
 	  document.querySelector("#steep_display").innerHTML = k;
+	});
+
+	document.querySelector("#noise").addEventListener('input', function(event) {
+	  var noise = +document.querySelector("#noise").value;
+	  neuroParams.noise = noise;
+	  document.querySelector("#noise_display").innerHTML = noise;
 	});
 
 	// document.querySelector("#force_magnitude").addEventListener('input', function(event) {
@@ -1135,12 +1153,12 @@
 	var neuroParams = __webpack_require__(1).neurosim.params;
 	var simParams = __webpack_require__(1).neurosim.control;
 
-	console.dir( neuroSim );
-	console.dir( render );
-	console.dir( "Render.update is: " + render.update );
+	// console.dir( neuroSim );
+	// console.dir( render );
+	// console.dir( "Render.update is: " + render.update );
 
 	var sim;
-	var neuron;
+	// var neuron;
 	var epoch = 0;
 
 
@@ -1167,39 +1185,7 @@
 
 	  // Here we need to calculate epochs
 	  if ( simParams.RUNNING ) {
-	    var nodes = window.graph.getNodes();
-	    var und_edges = window.graph.getUndEdges();
-	    var dir_edges = window.graph.getDirEdges();
-	    sim.Sine = true;
-	    var result = sim.calculateEpoch();
-	    var colors = [];
-	    var ctr = 0;
-	    for (var node in nodes) {
-	      colors[node] = interpolateColors (result[ctr++], -1, 1);
-	      mutate.colorSingleNode (nodes[node], colors[node]);
-	    }
-	    for ( var undy in und_edges ) {
-	      mutate.colorSingleEdge ( und_edges[undy], colors[und_edges[undy].getNodes().a.getID()], colors[und_edges[undy].getNodes().b.getID()]);
-	    }
-	    for ( var diry in dir_edges ) {
-	      mutate.colorSingleEdge ( dir_edges[diry], colors[dir_edges[diry].getNodes().a.getID()], colors[dir_edges[diry].getNodes().b.getID()]);
-	    }
-	    /*for ( var node in nodes ) {
-	      var random_color = +('0x'+Math.random().toString(16).substr(2, 6));
-	      mutate.colorSingleNode ( nodes[node], random_color);
-	    }
-	    for ( var undy in und_edges ) {
-	      var random_color_a = +('0x'+Math.random().toString(16).substr(2, 6));
-	      var random_color_b = +('0x'+Math.random().toString(16).substr(2, 6));
-	      mutate.colorSingleEdge ( und_edges[undy], random_color_a, random_color_b);
-	    }
-	    for ( var diry in dir_edges ) {
-	      var random_color_a = +('0x'+Math.random().toString(16).substr(2, 6));
-	      var random_color_b = +('0x'+Math.random().toString(16).substr(2, 6));
-	      mutate.colorSingleEdge ( dir_edges[diry], random_color_a, random_color_b);
-	    }*/
-
-	    window.requestAnimationFrame( render.update );
+	    execOnce();
 	  }
 	}
 
@@ -1230,15 +1216,34 @@
 
 
 	function execOnce() {
+	  if (sim.ActivationModel !== neuroParams.activation) {
+	    sim.setActivationModel (neuroParams.activation);
+	  }
+	  if (sim._neuron_list[0].Threshold !== neuroParams.threshold || sim._neuron_list[0].C !== neuroParams.amplitude || sim._neuron_list[0].K !== neuroParams.steepness) {
+	    for (var neuron = 0; neuron < window.graph.nrNodes(); ++neuron) {
+	    //   console.log (sim._neuron_list[neuron].Node.getID() + ": " + sim._neuron_list[neuron].Activation);
+	    //   if (sim._neuron_list[neuron].Node.getID() === "A" && !!!epoch) {
+	    //     sim._neuron_list[neuron].Activation = 0.999999;
+	    //   }
+	    //   if (sim._neuron_list[neuron].Node.getID() === "B" && !!!epoch) {
+	    //     sim._neuron_list[neuron].Activation = 0.5;
+	    //   }
+	      sim._neuron_list[neuron].Threshold = neuroParams.threshold;
+	      sim._neuron_list[neuron].C = neuroParams.amplitude;
+	      sim._neuron_list[neuron].K = neuroParams.steepness;
+	    }
+	  }
+	  // console.log ("Calculating and visualizing epoch nr: " + epoch++);
 	  var nodes = window.graph.getNodes();
 	  var und_edges = window.graph.getUndEdges();
 	  var dir_edges = window.graph.getDirEdges();
-	  sim.Sine = true;
+	  // sim.Sine = true;
+	  // sim.setActivationModel ("tanh");
 	  var result = sim.calculateEpoch();
 	  var colors = [];
 	  var ctr = 0;
 	  for (var node in nodes) {
-	    colors[node] = interpolateColors (result[ctr++], -1, 1);
+	    colors[node] = interpolateColors (result[ctr++], 0, 1);
 	    mutate.colorSingleNode (nodes[node], colors[node]);
 	  }
 	  for ( var undy in und_edges ) {
@@ -1247,15 +1252,35 @@
 	  for ( var diry in dir_edges ) {
 	    mutate.colorSingleEdge ( dir_edges[diry], colors[dir_edges[diry].getNodes().a.getID()], colors[dir_edges[diry].getNodes().b.getID()]);
 	  }
+	/*for ( var node in nodes ) {
+	    var random_color = +('0x'+Math.random().toString(16).substr(2, 6));
+	    mutate.colorSingleNode ( nodes[node], random_color);
+	  }
+	  for ( var undy in und_edges ) {
+	    var random_color_a = +('0x'+Math.random().toString(16).substr(2, 6));
+	    var random_color_b = +('0x'+Math.random().toString(16).substr(2, 6));
+	    mutate.colorSingleEdge ( und_edges[undy], random_color_a, random_color_b);
+	  }
+	  for ( var diry in dir_edges ) {
+	    var random_color_a = +('0x'+Math.random().toString(16).substr(2, 6));
+	    var random_color_b = +('0x'+Math.random().toString(16).substr(2, 6));
+	    mutate.colorSingleEdge ( dir_edges[diry], random_color_a, random_color_b);
+	  }*/
 
 	  window.requestAnimationFrame( render.update );
 	}
+
+	function setInputVec() {
+	  sim.generateInVec(0.05); // Additional implementation necessary!
+	}
+
 
 
 	module.exports = {
 	  initSimulation: initSimulation,
 	  execSimulation: execSimulation,
-	  execOnce: execOnce
+	  execOnce: execOnce,
+	  setInputVec: setInputVec
 	};
 
 /***/ },
