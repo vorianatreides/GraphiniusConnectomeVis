@@ -31,7 +31,7 @@ function setDirectionUnchecked() {
 
 
 sigmoidal.onclick = function() {
-  neuroParams.activation = "sigmoidl";
+  neuroParams.activation = "sigmoidal";
 };
 
 tanh.onclick = function() {
@@ -74,10 +74,15 @@ function startStopHistory() {
   }
 }
 
+document.querySelector("#percent").addEventListener('input', function(event) {
+  var percent = +document.querySelector("#percent").value;
+  neuroParams.percentage = percent;
+  document.querySelector("#percent_display").innerHTML = percent;
+});
+
 document.querySelector("#threshold").addEventListener('input', function(event) {
   var thresh = +document.querySelector("#threshold").value;
   neuroParams.threshold = thresh;
-  // console.log( "new thresh: " + thresh );
   document.querySelector("#thresh_display").innerHTML = thresh;
 });
 

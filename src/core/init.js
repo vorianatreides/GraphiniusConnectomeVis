@@ -7,7 +7,8 @@ var config = {
       amplitude: 1,
       steepness: 15,
       activation: "sigmoidal",
-      noise: 0
+      noise: 0,
+      percentage: 0
     },
     control: {
       RUNNING: false

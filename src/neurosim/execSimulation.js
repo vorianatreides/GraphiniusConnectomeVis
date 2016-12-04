@@ -70,26 +70,16 @@ function execOnce() {
   if (sim.ActivationModel !== neuroParams.activation) {
     sim.setActivationModel (neuroParams.activation);
   }
-  if (sim._neuron_list[0].Threshold !== neuroParams.threshold || sim._neuron_list[0].C !== neuroParams.amplitude || sim._neuron_list[0].K !== neuroParams.steepness) {
-    for (var neuron = 0; neuron < window.graph.nrNodes(); ++neuron) {
-    //   console.log (sim._neuron_list[neuron].Node.getID() + ": " + sim._neuron_list[neuron].Activation);
-    //   if (sim._neuron_list[neuron].Node.getID() === "A" && !!!epoch) {
-    //     sim._neuron_list[neuron].Activation = 0.999999;
-    //   }
-    //   if (sim._neuron_list[neuron].Node.getID() === "B" && !!!epoch) {
-    //     sim._neuron_list[neuron].Activation = 0.5;
-    //   }
-      sim._neuron_list[neuron].Threshold = neuroParams.threshold;
-      sim._neuron_list[neuron].C = neuroParams.amplitude;
-      sim._neuron_list[neuron].K = neuroParams.steepness;
-    }
+  if (sim.Threshold !== neuroParams.threshold || sim.Amplitude !== neuroParams.amplitude || sim.Steepness !== neuroParams.steepness || sim.Noise !== neuroParams.noise) {
+    sim.Threshold = neuroParams.threshold;
+    sim.Amplitude = neuroParams.amplitude;
+    sim.Steepness = neuroParams.steepness;
+    sim.Noise = !!neuroParams.noise ? (1 / neuroParams.noise - 1) : 0;
   }
   // console.log ("Calculating and visualizing epoch nr: " + epoch++);
   var nodes = window.graph.getNodes();
   var und_edges = window.graph.getUndEdges();
   var dir_edges = window.graph.getDirEdges();
-  // sim.Sine = true;
-  // sim.setActivationModel ("tanh");
   var result = sim.calculateEpoch();
   var colors = [];
   var ctr = 0;
@@ -122,7 +112,7 @@ function execOnce() {
 }
 
 function setInputVec() {
-  sim.generateInVec(0.05); // Additional implementation necessary!
+  sim.generateInVec(neuroParams.percentage); // Additional implementation necessary!
 }
 
 

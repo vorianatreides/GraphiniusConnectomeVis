@@ -37,16 +37,21 @@
               <span class="onoffswitch-inner force"></span>
               <span class="onoffswitch-switch"></span>
           </label>
-        </div><br/>
+        </div>
         
+        
+        <h5>Percentage of nodes to be randomly activated:</h5>
+        Percentage: <span id="percent_display">0</span> <br/>
+        <input id="percent" type="range" min="0" max="100" step="1" value="0" /> <br/><br/>
         <input id="setInputVec" value="Set a random input" type="button" onclick=$GV.sim.neuroSim.setInputVec()><br/>
+        
         
         <h4>Activation Function:</h4>
           <form>
             <input type="radio" id="sigmoidal" name="activation" value="sigmoidal" onclick><label for="sigmoidal">sigmoidal function</label><br>
             <input type="radio" id="tanh" name="activation" value="tanh" onclick><label for="tanh">hyperbolic tangent function</label><br>
             <input type="radio" id="step" name="activation" value="step" onclick><label for="step">unit step function</label><br>
-            <input type="radio" id="rlu" name="activation" value="rlu" onclick><label for="rlu">[parametric?] linear rectifier</label><br>
+            <input type="radio" id="rlu" name="activation" value="rlu" onclick><label for="rlu">linear rectifier</label><br>
             <input type="radio" id="sin" name="activation" value="sin" onclick><label for="sin">simple oscillation</label><br>
           </form>
         
@@ -58,11 +63,11 @@
         Threshold: <span id="thresh_display">0.6</span> <br/>
         <input id="threshold" type="range" min="0" max="5" step=".01" value="0.6" /> <br/>
         Amplitude: <span id="amp_display">1</span> <br/>
-        <input id="amplitude" type="range" min="1" max="5" step=".01" value="1" /> <br/>
+        <input id="amplitude" type="range" min=".1" max="5" step=".01" value="1" /> <br/>
         Steepness: <span id="steep_display">15</span> <br/>
         <input id="steepness" type="range" min="1" max="20" step=".1" value="15" /> <br/>
         Noise: <span id="noise_display">0</span> <br/>
-        <input id="noise" type="range" min="0" max="5" step=".01" value="0" /> <br/><br/>
+        <input id="noise" type="range" min="0" max="0.99" step=".01" value="0" /> <br/><br/>
         
         
         <input id="nextEpochButton" value="Show next epoch" type="button" onclick=$GV.sim.neuroSim.execOnce()><br/>
