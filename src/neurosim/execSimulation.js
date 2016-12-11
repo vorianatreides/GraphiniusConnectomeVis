@@ -4,9 +4,11 @@ var render = require('../core/render.js');
 var neuroParams = require("../core/init.js").neurosim.params;
 var simParams = require("../core/init.js").neurosim.control;
 
-// console.dir( neuroSim );
-// console.dir( render );
-// console.dir( "Render.update is: " + render.update );
+// TO DO:
+// * rlu upper bound
+// * Set a random input -> doesn't reset the activation values to 0 !!!
+// ^ sine hasn't been implemented correctly -> "break;" missing in the simulation class method
+// * find parameters for c elegans
 
 var sim;
 // var neuron;
@@ -41,18 +43,12 @@ function execSimulation() {
 }
 
 
-function interpolateColors (result, min, max) {
-  if (sim.Sine) {
-    min = -1;
-    max = 1;
-  }
+function interpolateColors (result, low, up) {
   var start_color = 0x0000ff,
       middle_color = 0x00ff00,
       end_color = 0xff0000,
       first_color = start_color,
       second_color = middle_color,
-      low = min,
-      up = max,
       half = (up - low) / 2,
       middle = low + half;
 
@@ -84,7 +80,7 @@ function execOnce() {
   var colors = [];
   var ctr = 0;
   for (var node in nodes) {
-    colors[node] = interpolateColors (result[ctr++], 0, 1);
+    colors[node] = interpolateColors (result[ctr++], neuroParams.amplitude * sim.Bounds[0], neuroParams.amplitude * sim.Bounds[1]);
     mutate.colorSingleNode (nodes[node], colors[node]);
   }
   for ( var undy in und_edges ) {
@@ -108,11 +104,12 @@ function execOnce() {
     mutate.colorSingleEdge ( dir_edges[diry], random_color_a, random_color_b);
   }*/
 
+  // console.log (neuroParams.amplitude * sim.Bounds[0] + "  " + neuroParams.amplitude * sim.Bounds[1]);
   window.requestAnimationFrame( render.update );
 }
 
 function setInputVec() {
-  sim.generateInVec(neuroParams.percentage); // Additional implementation necessary!
+  sim.generateInVec(neuroParams.percentage / 100); // Additional implementation necessary!
 }
 
 

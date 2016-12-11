@@ -1159,9 +1159,11 @@
 	var neuroParams = __webpack_require__(1).neurosim.params;
 	var simParams = __webpack_require__(1).neurosim.control;
 
-	// console.dir( neuroSim );
-	// console.dir( render );
-	// console.dir( "Render.update is: " + render.update );
+	// TO DO:
+	// * rlu upper bound
+	// * Set a random input -> doesn't reset the activation values to 0 !!!
+	// ^ sine hasn't been implemented correctly -> "break;" missing in the simulation class method
+	// * find parameters for c elegans
 
 	var sim;
 	// var neuron;
@@ -1196,18 +1198,12 @@
 	}
 
 
-	function interpolateColors (result, min, max) {
-	  if (sim.Sine) {
-	    min = -1;
-	    max = 1;
-	  }
+	function interpolateColors (result, low, up) {
 	  var start_color = 0x0000ff,
 	      middle_color = 0x00ff00,
 	      end_color = 0xff0000,
 	      first_color = start_color,
 	      second_color = middle_color,
-	      low = min,
-	      up = max,
 	      half = (up - low) / 2,
 	      middle = low + half;
 
@@ -1223,13 +1219,13 @@
 
 	function execOnce() {
 	  if (sim.ActivationModel !== neuroParams.activation) {
-	    if (neuroParams.activation === "sin") {sim.Sine = true;}
-	    else {sim.setActivationModel (neuroParams.activation);}
+	    sim.setActivationModel (neuroParams.activation);
 	  }
-	  if (sim.Threshold !== neuroParams.threshold || sim.Amplitude !== neuroParams.amplitude || sim.Steepness !== neuroParams.steepness) {
+	  if (sim.Threshold !== neuroParams.threshold || sim.Amplitude !== neuroParams.amplitude || sim.Steepness !== neuroParams.steepness || sim.Noise !== neuroParams.noise) {
 	    sim.Threshold = neuroParams.threshold;
 	    sim.Amplitude = neuroParams.amplitude;
 	    sim.Steepness = neuroParams.steepness;
+	    sim.Noise = !!neuroParams.noise ? (1 / neuroParams.noise - 1) : 0;
 	  }
 	  // console.log ("Calculating and visualizing epoch nr: " + epoch++);
 	  var nodes = window.graph.getNodes();
@@ -1239,7 +1235,7 @@
 	  var colors = [];
 	  var ctr = 0;
 	  for (var node in nodes) {
-	    colors[node] = interpolateColors (result[ctr++], 0, 1);
+	    colors[node] = interpolateColors (result[ctr++], neuroParams.amplitude * sim.Bounds[0], neuroParams.amplitude * sim.Bounds[1]);
 	    mutate.colorSingleNode (nodes[node], colors[node]);
 	  }
 	  for ( var undy in und_edges ) {
@@ -1263,11 +1259,12 @@
 	    mutate.colorSingleEdge ( dir_edges[diry], random_color_a, random_color_b);
 	  }*/
 
+	  // console.log (neuroParams.amplitude * sim.Bounds[0] + "  " + neuroParams.amplitude * sim.Bounds[1]);
 	  window.requestAnimationFrame( render.update );
 	}
 
 	function setInputVec() {
-	  sim.generateInVec(neuroParams.percentage); // Additional implementation necessary!
+	  sim.generateInVec(neuroParams.percentage / 100); // Additional implementation necessary!
 	}
 
 
